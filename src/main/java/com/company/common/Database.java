@@ -1,5 +1,7 @@
 package com.company.common;
 
+import com.company.models.Category;
+import com.company.models.Item;
 import com.company.models.User;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -14,9 +16,9 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class Database {
-    public static MongoCollection<User> admins;
     public static MongoCollection<User> users;
-    public static MongoCollection<User> items;
+    public static MongoCollection<Category> categories;
+    public static MongoCollection<Item> items;
 
     public static void initialize() {
         CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
@@ -28,8 +30,8 @@ public class Database {
                 .build();
         MongoClient mongoClient = MongoClients.create(clientSettings);
         MongoDatabase db = mongoClient.getDatabase("dcoms");
-        admins = db.getCollection("admins", User.class);
         users = db.getCollection("users", User.class);
-        items = db.getCollection("items", User.class);
+        categories = db.getCollection("categories", Category.class);
+        items = db.getCollection("items", Item.class);
     }
 }

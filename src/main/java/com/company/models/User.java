@@ -166,7 +166,7 @@ public class User {
 
     public static User findUserById(ObjectId id) throws NotFoundException {
         Bson filter = eq("_id", id);
-        User user = Database.admins.find(filter).first();
+        User user = Database.users.find(filter).first();
         if (user == null) {
             throw new NotFoundException("User ID");
         }
@@ -175,7 +175,7 @@ public class User {
 
     private static User findUserByUsername(String username) {
         Bson filter = eq("username", username);
-        return Database.admins.find(filter).first();
+        return Database.users.find(filter).first();
     }
 
     private static boolean checkRequiredFieldsUser(User user) {
@@ -201,7 +201,7 @@ public class User {
         if (!checkRequiredFieldsUser(user)) {
             throw new MandatoryException("username, password, first name, and IC/passport must be filled");
         }
-        InsertOneResult result = Database.admins.insertOne(user);
+        InsertOneResult result = Database.users.insertOne(user);
         return result.getInsertedId().asObjectId().getValue();
     }
 
@@ -236,7 +236,7 @@ public class User {
         updates.add(set("updated_at", new Date()));
         updates.add(set("admin", user.admin));
         updates = generateUpdates(updates, user);
-        if (Database.admins.updateOne(filter, updates).getModifiedCount() >= 1 ? true : false) {
+        if (Database.users.updateOne(filter, updates).getModifiedCount() >= 1 ? true : false) {
             return true;
         }
         throw new NotFoundException("User ID");
@@ -249,12 +249,12 @@ public class User {
             throw new NotMatchException("Old password", "saved password");
         }
         Bson update = set("password", Authentication.hash(newPassword));
-        return Database.admins.updateOne(filter, update).getModifiedCount() >= 1 ? true : false;
+        return Database.users.updateOne(filter, update).getModifiedCount() >= 1 ? true : false;
     }
 
     public static boolean deleteUser(ObjectId id) throws NotFoundException {
         Bson filter = eq("_id", id);
-        if (Database.admins.deleteOne(filter).getDeletedCount() >= 1 ? true : false) {
+        if (Database.users.deleteOne(filter).getDeletedCount() >= 1 ? true : false) {
             return true;
         }
         throw new NotFoundException("User ID");
