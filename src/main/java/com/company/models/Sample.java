@@ -1,5 +1,9 @@
 package com.company.models;
 
+import com.company.common.Authentication;
+import com.company.common.Database;
+import com.company.common.exceptions.DuplicateException;
+import com.company.common.exceptions.MandatoryException;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -23,23 +27,29 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class Sample {
-    public static void main(String[] args) {
-        CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
-        CodecRegistry codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
-                pojoCodecRegistry);
-        MongoClientSettings clientSettings = MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString("mongodb://localhost:27017"))
-                .codecRegistry(codecRegistry)
-                .build();
-        MongoClient mongoClient = MongoClients.create(clientSettings);
-        MongoDatabase db = mongoClient.getDatabase("dcoms");
-        MongoCollection<Admin> adminsCollection = db.getCollection("admins", Admin.class);
+    public static void main(String[] args) throws DuplicateException, MandatoryException {
+        Database.initialize();
 
-        Admin admin = new Admin(new Date());
-        adminsCollection.insertOne(admin);
+        User user = new User()
+                .setUsername("joshua")
+                .setPassword("password")
+                .setFirstName("Joshua")
+                .setIcPassport("B9554665");
+        ObjectId insertedId = User.insertUser(user);
 
-        Admin findAdmin = adminsCollection.find(eq("_id", new ObjectId("6007ff6f183d971f09c616da"))).first();
-        System.out.println(findAdmin);
+        try {
+            User.updateUserPassword(new ObjectId(), "passwor", "pass");
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+//        Admin admin = new Admin().setPassword("password");
+////        Database.admins.insertOne(admin);
+//        System.out.println(Authentication.match("password", "$s0$41010$kBCURPk05PcIgnIhPmKq8A==$ejSSdMYzmTcxA8gzif8dG+OdZgwU8fhVcqN/yq57Tms="));
+
+//        Bson filter = eq("_id", new ObjectId("6007ffaed3c75001ef69d548"));
+//        DeleteResult result = Database.admins.deleteOne(filter);
+//        System.out.println(result.getDeletedCount() >= 1 ? true : false);
+
 
 //            Document admin = new Document("_id", new ObjectId());
 //            admin.append("first_name", "Joshua");
