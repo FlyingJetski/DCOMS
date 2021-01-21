@@ -9,6 +9,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -139,7 +140,7 @@ public class Item {
         return Database.items.find(filter).first();
     }
 
-    public static boolean checkRequiredFieldsItem(Item item) {
+    private static boolean checkRequiredFieldsItem(Item item) {
         if (item.name == null || item.name.equals("")) {
             return false;
         }
