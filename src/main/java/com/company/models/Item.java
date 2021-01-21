@@ -1,9 +1,19 @@
 package com.company.models;
 
+import com.company.common.Database;
+import com.company.common.exceptions.DuplicateException;
+import com.company.common.exceptions.MandatoryException;
+import com.company.common.exceptions.NotFoundException;
+import com.mongodb.client.result.InsertOneResult;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.Date;
+
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 
 public class Item {
     //features: record grocery items, sales, stock, list available items, registration
@@ -17,9 +27,9 @@ public class Item {
     @BsonProperty(value = "category")
     private Category category;
     @BsonProperty(value = "stock")
-    private int stock;
+    private Integer stock;
     @BsonProperty(value = "price")
-    private double price;
+    private Double price;
     @BsonProperty(value = "description")
     private String description;
 
@@ -66,7 +76,7 @@ public class Item {
     }
 
     public Category getCategory() {
-        return category;
+        return this.category;
     }
 
     public Item setCategory(Category category) {
@@ -74,7 +84,7 @@ public class Item {
         return this;
     }
 
-    public int getStock() {
+    public Integer getStock() {
         return stock;
     }
 
@@ -83,7 +93,7 @@ public class Item {
         return this;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
@@ -113,5 +123,87 @@ public class Item {
                 ", price=" + price +
                 ", description='" + description + '\'' +
                 '}';
+    }
+
+    public static Item findItemById(ObjectId id) throws NotFoundException {
+        Bson filter = eq("_id", id);
+        Item item = Database.items.find(filter).first();
+        if (item == null) {
+            throw new NotFoundException("Item ID");
+        }
+        return item;
+    }
+
+    private static Item findItemByName(String itemname) {
+        Bson filter = eq("name", itemname);
+        return Database.items.find(filter).first();
+    }
+
+    public static boolean checkRequiredFieldsItem(Item item) {
+        if (item.name == null || item.name.equals("")) {
+            return false;
+        }
+        if (item.category == null) {
+            return false;
+        }
+        if (item.stock == null) {
+            item.stock = 0;
+        }
+        if (item.price == null) {
+            item.price = 0.0;
+        }
+        return true;
+    }
+
+    public static ObjectId insertItem(Item item) throws DuplicateException, MandatoryException {
+        if (findItemByName(item.name) != null) {
+            throw new DuplicateException("The item name");
+        }
+        if (!checkRequiredFieldsItem(item)) {
+            throw new MandatoryException("item name and category must be filled");
+        }
+        InsertOneResult result = Database.items.insertOne(item);
+        return result.getInsertedId().asObjectId().getValue();
+    }
+
+    private static ArrayList<Bson> generateUpdates(ArrayList<Bson> updates, Item item) {
+        if (item.name != null && !item.name.equals("")) {
+            updates.add(set("name", item.name));
+        }
+        if (item.category != null) {
+            updates.add(set("category", item.category));
+        }
+        if (item.name != null && !item.name.equals("")) {
+            updates.add(set("name", item.name));
+        }
+        if (item.stock != null) {
+            updates.add(set("stock", item.stock));
+        }
+        if (item.price != null) {
+            updates.add(set("price", item.price));
+        }
+        if (item.description != null) {
+            updates.add(set("description", item.description));
+        }
+        return updates;
+    }
+
+    public static boolean updateItem(ObjectId id, Item item) throws NotFoundException {
+        Bson filter = eq("_id", id);
+        ArrayList<Bson> updates = new ArrayList<Bson>();
+        updates.add(set("updated_at", new Date()));
+        updates = generateUpdates(updates, item);
+        if (Database.items.updateOne(filter, updates).getModifiedCount() >= 1 ? true : false) {
+            return true;
+        }
+        throw new NotFoundException("Item ID");
+    }
+
+    public static boolean deleteItem(ObjectId id) throws NotFoundException {
+        Bson filter = eq("_id", id);
+        if (Database.items.deleteOne(filter).getDeletedCount() >= 1 ? true : false) {
+            return true;
+        }
+        throw new NotFoundException("Item ID");
     }
 }

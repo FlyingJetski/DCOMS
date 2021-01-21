@@ -30,18 +30,26 @@ public class Sample {
     public static void main(String[] args) throws DuplicateException, MandatoryException {
         Database.initialize();
 
-        User user = new User()
-                .setUsername("joshua")
-                .setPassword("password")
-                .setFirstName("Joshua")
-                .setIcPassport("B9554665");
-        ObjectId insertedId = User.insertUser(user);
+//        Item item = new Item()
+//                .setName("asd")
+//                .setCategory(new Category());
+//        System.out.println(item.getStock());
+//
+//        Item.checkRequiredFieldsItem(item);
+//        System.out.println(item.getStock());
 
-        try {
-            User.updateUserPassword(new ObjectId(), "passwor", "pass");
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
+//        User user = new User()
+//                .setUsername("joshua")
+//                .setPassword("password")
+//                .setFirstName("Joshua")
+//                .setIcPassport("B9554665");
+//        ObjectId insertedId = User.insertUser(user);
+//
+//        try {
+//            User.updateUserPassword(new ObjectId(), "passwor", "pass");
+//        } catch (Exception e) {
+//            System.out.println(e.toString());
+//        }
 //        Admin admin = new Admin().setPassword("password");
 ////        Database.admins.insertOne(admin);
 //        System.out.println(Authentication.match("password", "$s0$41010$kBCURPk05PcIgnIhPmKq8A==$ejSSdMYzmTcxA8gzif8dG+OdZgwU8fhVcqN/yq57Tms="));
