@@ -1,21 +1,9 @@
 package com.company.models;
 
-import com.company.common.Authentication;
-import com.company.common.Database;
-import com.company.common.exceptions.DuplicateException;
-import com.company.common.exceptions.MandatoryException;
-import com.company.common.exceptions.NotFoundException;
-import com.company.common.exceptions.NotMatchException;
-import com.mongodb.client.result.InsertOneResult;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
 import java.util.Date;
-
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
 
 public class Category {
     //category: fruits, vegetables, dairy products, cereals

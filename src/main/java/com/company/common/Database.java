@@ -1,5 +1,6 @@
 package com.company.common;
 
+import com.company.models.Activity;
 import com.company.models.Category;
 import com.company.models.Item;
 import com.company.models.User;
@@ -16,6 +17,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class Database {
+    public static MongoCollection<Activity> activities;
     public static MongoCollection<User> users;
     public static MongoCollection<Category> categories;
     public static MongoCollection<Item> items;
@@ -30,6 +32,7 @@ public class Database {
                 .build();
         MongoClient mongoClient = MongoClients.create(clientSettings);
         MongoDatabase db = mongoClient.getDatabase("dcoms");
+        activities = db.getCollection("activities", Activity.class);
         users = db.getCollection("users", User.class);
         categories = db.getCollection("categories", Category.class);
         items = db.getCollection("items", Item.class);

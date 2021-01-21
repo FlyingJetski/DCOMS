@@ -1,23 +1,11 @@
 package com.company.models;
 
-import com.company.common.Database;
-import com.company.common.exceptions.DuplicateException;
-import com.company.common.exceptions.MandatoryException;
-import com.company.common.exceptions.NotFoundException;
-import com.mongodb.client.result.InsertOneResult;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Date;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
-
 public class Item {
-    //features: record grocery items, sales, stock, list available items, registration
     private ObjectId id;
     @BsonProperty(value = "created_at")
     private Date createdAt;
@@ -25,6 +13,8 @@ public class Item {
     private Date updatedAt;
     @BsonProperty(value = "name")
     private String name;
+    @BsonProperty(value = "category_id")
+    private ObjectId categoryId;
     @BsonProperty(value = "category")
     private Category category;
     @BsonProperty(value = "stock")
@@ -76,6 +66,15 @@ public class Item {
         return this;
     }
 
+    public ObjectId getCategoryId() {
+        return categoryId;
+    }
+
+    public Item setCategoryId(ObjectId categoryId) {
+        this.categoryId = categoryId;
+        return this;
+    }
+
     public Category getCategory() {
         return this.category;
     }
@@ -89,7 +88,7 @@ public class Item {
         return stock;
     }
 
-    public Item setStock(int stock) {
+    public Item setStock(Integer stock) {
         this.stock = stock;
         return this;
     }
@@ -98,7 +97,7 @@ public class Item {
         return price;
     }
 
-    public Item setPrice(double price) {
+    public Item setPrice(Double price) {
         this.price = price;
         return this;
     }

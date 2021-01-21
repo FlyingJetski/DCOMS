@@ -1,6 +1,5 @@
 package com.company.models;
 
-import com.company.common.Authentication;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
@@ -83,6 +82,11 @@ public class User implements Serializable {
 
     public String getPassword() {
         return password;
+    }
+
+    public User setPassword(String password) {
+        this.password = password;
+        return this;
     }
 
     public String getFirstName() {

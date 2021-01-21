@@ -57,18 +57,15 @@ public class UserUtility {
     }
 
     public static ObjectId insertUser(User user) throws DuplicateException, MandatoryException {
-//        if (findUserByUsername(user.username) != null) {
-//            throw new DuplicateException("The username");
-//        }
-        System.out.println("test");
+        if (findUserByUsername(user.getUsername()) != null) {
+            throw new DuplicateException("The username");
+        }
         if (!checkRequiredFieldsUser(user)) {
             throw new MandatoryException("username, password, first name, and IC/passport must be filled");
         }
-        System.out.println(Database.users);
-        System.out.println(user);
 
+        user.setPassword(Authentication.hash(user.getPassword()));
         InsertOneResult result = Database.users.insertOne(user);
-        System.out.println(result);
         return result.getInsertedId().asObjectId().getValue();
     }
 
