@@ -1,6 +1,7 @@
 package com.company;
 
 import com.company.common.*;
+import com.company.utility.*;
 import com.company.common.exceptions.DuplicateException;
 import com.company.common.exceptions.MandatoryException;
 import com.company.common.exceptions.NotFoundException;
@@ -22,73 +23,73 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
     // User
     @Override
     public User findUserById(ObjectId id) throws RemoteException, NotFoundException {
-        return User.findUserById(id);
+        return UserUtility.findUserById(id);
     }
 
     @Override
     public ObjectId insertUser(User user) throws RemoteException, DuplicateException, MandatoryException {
-        return User.insertUser(user);
+        return UserUtility.insertUser(user);
     }
 
     @Override
     public boolean updateUser(ObjectId id, User user) throws RemoteException, NotFoundException {
-        return User.updateUser(id, user);
+        return UserUtility.updateUser(id, user);
     }
 
     @Override
     public boolean updateUserPassword(ObjectId id, String oldPassword, String newPassword) throws RemoteException, NotFoundException, NotMatchException {
-        return User.updateUserPassword(id, oldPassword, newPassword);
+        return UserUtility.updateUserPassword(id, oldPassword, newPassword);
     }
 
     @Override
     public boolean deleteUser(ObjectId id) throws RemoteException, NotFoundException {
-        return User.deleteUser(id);
+        return UserUtility.deleteUser(id);
     }
 
     @Override
     public boolean logIn(String username, String password) throws RemoteException, NotFoundException {
-        return User.logIn(username, password);
+        return UserUtility.logIn(username, password);
     }
 
     // Category
     @Override
-    public Category findCategoryById(ObjectId id) throws NotFoundException {
-        return Category.findCategoryById(id);
+    public Category findCategoryById(ObjectId id) throws RemoteException, NotFoundException {
+        return CategoryUtility.findCategoryById(id);
     }
 
     @Override
-    public ObjectId insertCategory(Category category) throws DuplicateException, MandatoryException {
-        return Category.insertCategory(category);
+    public ObjectId insertCategory(Category category) throws RemoteException, DuplicateException, MandatoryException {
+        return CategoryUtility.insertCategory(category);
     }
 
     @Override
-    public boolean updateCategory(ObjectId id, Category category) throws NotFoundException {
-        return Category.updateCategory(id, category);
+    public boolean updateCategory(ObjectId id, Category category) throws RemoteException, NotFoundException {
+        return CategoryUtility.updateCategory(id, category);
     }
 
     @Override
-    public boolean deleteCategory(ObjectId id) throws NotFoundException {
-        return Category.deleteCategory(id);
+    public boolean deleteCategory(ObjectId id) throws RemoteException, NotFoundException {
+        return CategoryUtility.deleteCategory(id);
     }
 
     // Item
     @Override
-    public Item findItemById(ObjectId id) throws NotFoundException {
-        return Item.findItemById(id);
+    public Item findItemById(ObjectId id) throws RemoteException, NotFoundException {
+        return ItemUtility.findItemById(id);
     }
 
     @Override
-    public ObjectId insertItem(Item item) throws DuplicateException, MandatoryException {
-        return Item.insertItem(item);
+    public ObjectId insertItem(Item item) throws RemoteException, DuplicateException, MandatoryException {
+        return ItemUtility.insertItem(item);
     }
 
     @Override
-    public boolean updateItem(ObjectId id, Item item) throws NotFoundException {
-        return Item.updateItem(id, item);
+    public boolean updateItem(ObjectId id, Item item) throws RemoteException, NotFoundException {
+        return ItemUtility.updateItem(id, item);
     }
 
     @Override
-    public boolean deleteItem(ObjectId id) throws NotFoundException {
-        return Item.deleteItem(id);
+    public boolean deleteItem(ObjectId id) throws RemoteException, NotFoundException {
+        return ItemUtility.deleteItem(id);
     }
 }

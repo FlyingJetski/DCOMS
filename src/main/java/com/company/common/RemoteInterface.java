@@ -28,20 +28,20 @@ public interface RemoteInterface extends Remote {
     public boolean logIn(String username, String password) throws RemoteException, NotFoundException;
 
     // Category
-    public Category findCategoryById(ObjectId id) throws NotFoundException;
+    public Category findCategoryById(ObjectId id) throws RemoteException, NotFoundException;
 
-    public ObjectId insertCategory(Category category) throws DuplicateException, MandatoryException;
+    public ObjectId insertCategory(Category category) throws RemoteException, DuplicateException, MandatoryException;
 
-    public boolean updateCategory(ObjectId id, Category category) throws NotFoundException;
+    public boolean updateCategory(ObjectId id, Category category) throws RemoteException, NotFoundException;
 
-    public boolean deleteCategory(ObjectId id) throws NotFoundException;
+    public boolean deleteCategory(ObjectId id) throws RemoteException, NotFoundException;
 
     // Item
-    public Item findItemById(ObjectId id) throws NotFoundException;
+    public Item findItemById(ObjectId id) throws RemoteException, NotFoundException;
 
-    public ObjectId insertItem(Item item) throws DuplicateException, MandatoryException;
+    public ObjectId insertItem(Item item) throws RemoteException, DuplicateException, MandatoryException;
 
-    public boolean updateItem(ObjectId id, Item item) throws NotFoundException;
+    public boolean updateItem(ObjectId id, Item item) throws RemoteException, NotFoundException;
 
-    public boolean deleteItem(ObjectId id) throws NotFoundException;
+    public boolean deleteItem(ObjectId id) throws RemoteException, NotFoundException;
 }

@@ -1,13 +1,24 @@
-package com.company.models;
+package com.company.client;
 
 import com.company.common.Authentication;
+import com.company.common.Database;
+import com.company.common.exceptions.DuplicateException;
+import com.company.common.exceptions.MandatoryException;
+import com.company.common.exceptions.NotFoundException;
+import com.company.common.exceptions.NotMatchException;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.InsertOneResult;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
-public class User implements Serializable {
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.*;
+
+public class User {
     private ObjectId id;
     @BsonProperty(value = "created_at")
     private Date createdAt;
@@ -83,6 +94,12 @@ public class User implements Serializable {
 
     public String getPassword() {
         return password;
+    }
+
+    public User setPassword(String password) {
+        password = Authentication.hash(password);
+        this.password = password;
+        return this;
     }
 
     public String getFirstName() {
