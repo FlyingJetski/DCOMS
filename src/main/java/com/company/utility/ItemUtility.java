@@ -5,6 +5,9 @@ import com.company.common.exceptions.DuplicateException;
 import com.company.common.exceptions.MandatoryException;
 import com.company.common.exceptions.NotFoundException;
 import com.company.models.Item;
+import com.company.models.Pagination;
+import com.company.models.Sort;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -12,7 +15,9 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Filters.regex;
 import static com.mongodb.client.model.Updates.set;
 
 public class ItemUtility {
@@ -20,17 +25,74 @@ public class ItemUtility {
         throw new UnsupportedOperationException();
     }
 
+    public static ArrayList<Item> getItems(String searchString, Sort sort, Pagination pagination) {
+        ArrayList<Bson> aggregation = new ArrayList<Bson>();
+        aggregation.add(lookup("categories", "category_id", "_id", "category"));
+        if (searchString != null) {
+            aggregation.add(or(
+                    regex("name", searchString),
+                    regex("category.name", searchString),
+                    regex("stock", searchString),
+                    regex("price", searchString),
+                    regex("description", searchString)
+            ));
+        }
+        if (sort != null) {
+            switch (sort.getOption()) {
+                case BY_NAME:
+                    if (sort.isAsc()) {
+                        aggregation.add(sort(Sorts.ascending("name")));
+                    } else {
+                        aggregation.add(sort(Sorts.descending("name")));
+                    }
+                    break;
+                case BY_CATEGORY:
+                    if (sort.isAsc()) {
+                        aggregation.add(sort(Sorts.ascending("category.name")));
+                    } else {
+                        aggregation.add(sort(Sorts.descending("category.name")));
+                    }
+                    break;
+                case BY_STOCK:
+                    if (sort.isAsc()) {
+                        aggregation.add(sort(Sorts.ascending("stock")));
+                    } else {
+                        aggregation.add(sort(Sorts.descending("stock")));
+                    }
+                    break;
+                case BY_PRICE:
+                    if (sort.isAsc()) {
+                        aggregation.add(sort(Sorts.ascending("price")));
+                    } else {
+                        aggregation.add(sort(Sorts.descending("price")));
+                    }
+                    break;
+                case BY_DESC:
+                    if (sort.isAsc()) {
+                        aggregation.add(sort(Sorts.ascending("description")));
+                    } else {
+                        aggregation.add(sort(Sorts.descending("description")));
+                    }
+                    break;
+            }
+        }
+        aggregation = Pagination.paginate(aggregation, pagination);
+        return Database.items.aggregate(aggregation).into(new ArrayList<Item>());
+    }
+
     public static Item findItemById(ObjectId id) throws NotFoundException {
-        Bson filter = eq("_id", id);
-        Item item = Database.items.find(filter).first();
+        ArrayList<Bson> aggregation = new ArrayList<Bson>();
+        aggregation.add(match(eq("_id", id)));
+        aggregation.add(lookup("categories", "category_id", "_id", "category"));
+        Item item = Database.items.aggregate(aggregation).into(new ArrayList<Item>()).get(0);
         if (item == null) {
             throw new NotFoundException("Item ID");
         }
         return item;
     }
 
-    private static Item findItemByName(String itemname) {
-        Bson filter = eq("name", itemname);
+    private static Item findItemByName(String name) {
+        Bson filter = eq("name", name);
         return Database.items.find(filter).first();
     }
 
@@ -52,7 +114,7 @@ public class ItemUtility {
 
     public static ObjectId insertItem(Item item) throws DuplicateException, MandatoryException {
         if (findItemByName(item.getName()) != null) {
-            throw new DuplicateException("The item name");
+            throw new DuplicateException("The item ");
         }
         if (!checkRequiredFieldsItem(item)) {
             throw new MandatoryException("item name and category must be filled");

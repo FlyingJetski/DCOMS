@@ -4,16 +4,17 @@ import com.company.common.exceptions.DuplicateException;
 import com.company.common.exceptions.MandatoryException;
 import com.company.common.exceptions.NotFoundException;
 import com.company.common.exceptions.NotMatchException;
-import com.company.models.Category;
-import com.company.models.Item;
-import com.company.models.User;
+import com.company.models.*;
 import org.bson.types.ObjectId;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 public interface RemoteInterface extends Remote {
     // User
+    public ArrayList<User> getUsers(boolean isAdmin, String searchString, Sort sort, Pagination pagination);
+
     public User findUserById(ObjectId id) throws RemoteException, NotFoundException;
 
     public ObjectId insertUser(User user) throws RemoteException, DuplicateException, MandatoryException;
@@ -28,6 +29,8 @@ public interface RemoteInterface extends Remote {
     public boolean logIn(String username, String password) throws RemoteException, NotFoundException;
 
     // Category
+    public ArrayList<Category> getCategories(String searchString, Sort sort, Pagination pagination);
+
     public Category findCategoryById(ObjectId id) throws RemoteException, NotFoundException;
 
     public ObjectId insertCategory(Category category) throws RemoteException, DuplicateException, MandatoryException;
@@ -37,6 +40,8 @@ public interface RemoteInterface extends Remote {
     public boolean deleteCategory(ObjectId id) throws RemoteException, NotFoundException;
 
     // Item
+    public ArrayList<Item> getItems(String searchString, Sort sort, Pagination pagination);
+
     public Item findItemById(ObjectId id) throws RemoteException, NotFoundException;
 
     public ObjectId insertItem(Item item) throws RemoteException, DuplicateException, MandatoryException;

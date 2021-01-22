@@ -1,18 +1,17 @@
 package com.company;
 
 import com.company.common.*;
+import com.company.models.*;
 import com.company.utility.*;
 import com.company.common.exceptions.DuplicateException;
 import com.company.common.exceptions.MandatoryException;
 import com.company.common.exceptions.NotFoundException;
 import com.company.common.exceptions.NotMatchException;
-import com.company.models.Category;
-import com.company.models.Item;
-import com.company.models.User;
 import org.bson.types.ObjectId;
 
 import java.rmi.*;
 import java.rmi.server.*;
+import java.util.ArrayList;
 
 @SuppressWarnings("serial")
 public class Server extends UnicastRemoteObject implements RemoteInterface {
@@ -21,6 +20,11 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
     }
 
     // User
+    @Override
+    public ArrayList<User> getUsers(boolean isAdmin, String searchString, Sort sort, Pagination pagination) {
+        return UserUtility.getUsers(isAdmin, searchString, sort, pagination);
+    }
+
     @Override
     public User findUserById(ObjectId id) throws RemoteException, NotFoundException {
         return UserUtility.findUserById(id);
@@ -53,6 +57,11 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
 
     // Category
     @Override
+    public ArrayList<Category> getCategories(String searchString, Sort sort, Pagination pagination) {
+        return CategoryUtility.getCategories(searchString, sort, pagination);
+    }
+
+    @Override
     public Category findCategoryById(ObjectId id) throws RemoteException, NotFoundException {
         return CategoryUtility.findCategoryById(id);
     }
@@ -73,6 +82,11 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
     }
 
     // Item
+    @Override
+    public ArrayList<Item> getItems(String searchString, Sort sort, Pagination pagination) {
+        return ItemUtility.getItems(searchString, sort, pagination);
+    }
+
     @Override
     public Item findItemById(ObjectId id) throws RemoteException, NotFoundException {
         return ItemUtility.findItemById(id);

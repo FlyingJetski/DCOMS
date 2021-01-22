@@ -6,7 +6,10 @@ import com.company.common.exceptions.DuplicateException;
 import com.company.common.exceptions.MandatoryException;
 import com.company.common.exceptions.NotFoundException;
 import com.company.common.exceptions.NotMatchException;
+import com.company.models.Pagination;
+import com.company.models.Sort;
 import com.company.models.User;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -14,7 +17,9 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.set;
 
 public class UserUtility {
@@ -22,8 +27,26 @@ public class UserUtility {
         throw new UnsupportedOperationException();
     }
 
-    public static String testUser(User user) {
-        return user.toString() + "test";
+    public static ArrayList<User> getUsers(Boolean isAdmin, String searchString, Sort sort, Pagination pagination) {
+        ArrayList<Bson> aggregation = new ArrayList<Bson>();
+        aggregation.add(match(eq("is_admin", isAdmin)));
+        if (searchString != null) {
+            aggregation.add(or(
+                    regex("first_name", searchString),
+                    regex("last_name", searchString),
+                    regex("address", searchString),
+                    regex("phone_number", searchString)
+            ));
+        }
+        if (sort != null) {
+            if (sort.isAsc()) {
+                aggregation.add(sort(Sorts.ascending("first_name")));
+            } else {
+                aggregation.add(sort(Sorts.descending("first_name")));
+            }
+        }
+        aggregation = Pagination.paginate(aggregation, pagination);
+        return Database.users.aggregate(aggregation).into(new ArrayList<User>());
     }
 
     public static User findUserById(ObjectId id) throws NotFoundException {

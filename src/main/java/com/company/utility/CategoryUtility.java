@@ -5,6 +5,9 @@ import com.company.common.exceptions.DuplicateException;
 import com.company.common.exceptions.MandatoryException;
 import com.company.common.exceptions.NotFoundException;
 import com.company.models.Category;
+import com.company.models.Pagination;
+import com.company.models.Sort;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -12,12 +15,45 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Filters.regex;
 import static com.mongodb.client.model.Updates.set;
 
 public class CategoryUtility {
     private CategoryUtility() {
         throw new UnsupportedOperationException();
+    }
+
+    public static ArrayList<Category> getCategories(String searchString, Sort sort, Pagination pagination) {
+        ArrayList<Bson> aggregation = new ArrayList<Bson>();
+        if (searchString != null) {
+            aggregation.add(or(
+                    regex("name", searchString),
+                    regex("description", searchString)
+            ));
+        }
+        if (sort != null) {
+            switch (sort.getOption()) {
+                case BY_NAME:
+                    if (sort.isAsc()) {
+                        aggregation.add(sort(Sorts.ascending("name")));
+                    } else {
+                        aggregation.add(sort(Sorts.descending("name")));
+                    }
+                    break;
+                case BY_DESC:
+                    if (sort.isAsc()) {
+                        aggregation.add(sort(Sorts.ascending("description")));
+                    } else {
+                        aggregation.add(sort(Sorts.descending("description")));
+                    }
+                    break;
+            }
+        }
+        aggregation = Pagination.paginate(aggregation, pagination);
+        return Database.categories.aggregate(aggregation).into(new ArrayList<Category>());
     }
 
     public static Category findCategoryById(ObjectId id) throws NotFoundException {
