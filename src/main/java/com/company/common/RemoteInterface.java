@@ -12,8 +12,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public interface RemoteInterface extends Remote {
+    // Miscellaneous
+    public void resetDatabase() throws RemoteException, DuplicateException, MandatoryException;
+
     // User
-    public ArrayList<User> getUsers(boolean isAdmin, String searchString, Sort sort, Pagination pagination);
+    public ArrayList<User> getUsers(boolean isAdmin, String searchString, Sort sort, Pagination pagination) throws RemoteException ;
 
     public User findUserById(ObjectId id) throws RemoteException, NotFoundException;
 
@@ -29,7 +32,7 @@ public interface RemoteInterface extends Remote {
     public boolean logIn(String username, String password) throws RemoteException, NotFoundException;
 
     // Category
-    public ArrayList<Category> getCategories(String searchString, Sort sort, Pagination pagination);
+    public ArrayList<Category> getCategories(String searchString, Sort sort, Pagination pagination) throws RemoteException ;
 
     public Category findCategoryById(ObjectId id) throws RemoteException, NotFoundException;
 
@@ -40,7 +43,7 @@ public interface RemoteInterface extends Remote {
     public boolean deleteCategory(ObjectId id) throws RemoteException, NotFoundException;
 
     // Item
-    public ArrayList<Item> getItems(String searchString, Sort sort, Pagination pagination);
+    public ArrayList<Item> getItems(String searchString, Sort sort, Pagination pagination) throws RemoteException ;
 
     public Item findItemById(ObjectId id) throws RemoteException, NotFoundException;
 

@@ -19,9 +19,15 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
         super();
     }
 
+    // Miscellaneous
+    @Override
+    public void resetDatabase() throws RemoteException, DuplicateException, MandatoryException {
+        Database.resetDatabase();
+    }
+
     // User
     @Override
-    public ArrayList<User> getUsers(boolean isAdmin, String searchString, Sort sort, Pagination pagination) {
+    public ArrayList<User> getUsers(boolean isAdmin, String searchString, Sort sort, Pagination pagination) throws RemoteException {
         return UserUtility.getUsers(isAdmin, searchString, sort, pagination);
     }
 
@@ -57,7 +63,7 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
 
     // Category
     @Override
-    public ArrayList<Category> getCategories(String searchString, Sort sort, Pagination pagination) {
+    public ArrayList<Category> getCategories(String searchString, Sort sort, Pagination pagination) throws RemoteException {
         return CategoryUtility.getCategories(searchString, sort, pagination);
     }
 
@@ -83,7 +89,7 @@ public class Server extends UnicastRemoteObject implements RemoteInterface {
 
     // Item
     @Override
-    public ArrayList<Item> getItems(String searchString, Sort sort, Pagination pagination) {
+    public ArrayList<Item> getItems(String searchString, Sort sort, Pagination pagination) throws RemoteException {
         return ItemUtility.getItems(searchString, sort, pagination);
     }
 
