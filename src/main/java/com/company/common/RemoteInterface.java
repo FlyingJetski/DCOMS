@@ -1,9 +1,5 @@
 package com.company.common;
 
-import com.company.common.exceptions.DuplicateException;
-import com.company.common.exceptions.MandatoryException;
-import com.company.common.exceptions.NotFoundException;
-import com.company.common.exceptions.NotMatchException;
 import com.company.models.*;
 import org.bson.types.ObjectId;
 
@@ -13,43 +9,42 @@ import java.util.ArrayList;
 
 public interface RemoteInterface extends Remote {
     // Miscellaneous
-    public void resetDatabase() throws RemoteException, DuplicateException, MandatoryException;
+    public void resetDatabase() throws RemoteException;
 
     // User
     public ArrayList<User> getUsers(boolean isAdmin, String searchString, Sort sort, Pagination pagination) throws RemoteException ;
 
-    public User findUserById(ObjectId id) throws RemoteException, NotFoundException;
+    public User findUserById(ObjectId id) throws RemoteException;
 
-    public ObjectId insertUser(User user) throws RemoteException, DuplicateException, MandatoryException;
+    public ObjectId insertUser(User user) throws RemoteException;
 
-    public boolean updateUser(ObjectId id, User user) throws RemoteException, NotFoundException;
+    public boolean updateUser(ObjectId id, User user) throws RemoteException;
 
-    public boolean updateUserPassword(ObjectId id, String oldPassword, String newPassword)
-            throws RemoteException, NotFoundException, NotMatchException;
+    public boolean updateUserPassword(ObjectId id, String oldPassword, String newPassword) throws RemoteException;
 
-    public boolean deleteUser(ObjectId id) throws RemoteException, NotFoundException;
+    public boolean deleteUser(ObjectId id) throws RemoteException;
 
-    public boolean logIn(String username, String password) throws RemoteException, NotFoundException;
+    public boolean logIn(String username, String password) throws RemoteException;
 
     // Category
     public ArrayList<Category> getCategories(String searchString, Sort sort, Pagination pagination) throws RemoteException ;
 
-    public Category findCategoryById(ObjectId id) throws RemoteException, NotFoundException;
+    public Category findCategoryById(ObjectId id) throws RemoteException;
 
-    public ObjectId insertCategory(Category category) throws RemoteException, DuplicateException, MandatoryException;
+    public ObjectId insertCategory(Category category) throws RemoteException;
 
-    public boolean updateCategory(ObjectId id, Category category) throws RemoteException, NotFoundException;
+    public boolean updateCategory(ObjectId id, Category category) throws RemoteException;
 
-    public boolean deleteCategory(ObjectId id) throws RemoteException, NotFoundException;
+    public boolean deleteCategory(ObjectId id) throws RemoteException;
 
     // Item
     public ArrayList<Item> getItems(String searchString, Sort sort, Pagination pagination) throws RemoteException ;
 
-    public Item findItemById(ObjectId id) throws RemoteException, NotFoundException;
+    public Item findItemById(ObjectId id) throws RemoteException;
 
-    public ObjectId insertItem(Item item) throws RemoteException, DuplicateException, MandatoryException;
+    public ObjectId insertItem(Item item) throws RemoteException;
 
-    public boolean updateItem(ObjectId id, Item item) throws RemoteException, NotFoundException;
+    public boolean updateItem(ObjectId id, Item item) throws RemoteException;
 
-    public boolean deleteItem(ObjectId id) throws RemoteException, NotFoundException;
+    public boolean deleteItem(ObjectId id) throws RemoteException;
 }

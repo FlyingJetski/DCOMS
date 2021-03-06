@@ -1,9 +1,6 @@
 package com.company.utility;
 
 import com.company.common.Database;
-import com.company.common.exceptions.DuplicateException;
-import com.company.common.exceptions.MandatoryException;
-import com.company.common.exceptions.NotFoundException;
 import com.company.models.Sale;
 import com.company.models.Pagination;
 import com.company.models.SaleItem;
@@ -59,14 +56,11 @@ public class SaleUtility {
         return Database.sales.aggregate(aggregation).into(new ArrayList<Sale>());
     }
 
-    public static Sale findSaleById(ObjectId id) throws NotFoundException {
+    public static Sale findSaleById(ObjectId id) {
         ArrayList<Bson> aggregation = new ArrayList<Bson>();
         aggregation.add(match(eq("_id", id)));
         aggregation.add(lookup("categories", "category_id", "_id", "category"));
         Sale sale = Database.sales.aggregate(aggregation).into(new ArrayList<Sale>()).get(0);
-        if (sale == null) {
-            throw new NotFoundException("Sale ID");
-        }
         return sale;
     }
 
@@ -85,10 +79,7 @@ public class SaleUtility {
         return totalPrice;
     }
 
-    public static ObjectId insertSale(Sale sale) throws DuplicateException, MandatoryException {
-        if (!checkRequiredFieldsSale(sale)) {
-            throw new MandatoryException("sale items must be filled");
-        }
+    public static ObjectId insertSale(Sale sale) {
         sale.setTotal(generateTotalPrice(sale.getSaleItems()));
         InsertOneResult result = Database.sales.insertOne(sale);
         return result.getInsertedId().asObjectId().getValue();
@@ -102,7 +93,7 @@ public class SaleUtility {
         return updates;
     }
 
-    public static boolean updateSale(ObjectId id, Sale sale) throws NotFoundException {
+    public static boolean updateSale(ObjectId id, Sale sale) {
         Bson filter = eq("_id", id);
         ArrayList<Bson> updates = new ArrayList<Bson>();
         updates.add(set("updated_at", new Date()));
@@ -110,14 +101,14 @@ public class SaleUtility {
         if (Database.sales.updateOne(filter, updates).getModifiedCount() >= 1 ? true : false) {
             return true;
         }
-        throw new NotFoundException("Sale ID");
+        return false;
     }
 
-    public static boolean deleteSale(ObjectId id) throws NotFoundException {
+    public static boolean deleteSale(ObjectId id) {
         Bson filter = eq("_id", id);
         if (Database.sales.deleteOne(filter).getDeletedCount() >= 1 ? true : false) {
             return true;
         }
-        throw new NotFoundException("Sale ID");
+        return false;
     }
 }

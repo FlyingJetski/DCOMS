@@ -1,7 +1,5 @@
 package com.company.common;
 
-import com.company.common.exceptions.DuplicateException;
-import com.company.common.exceptions.MandatoryException;
 import com.company.models.*;
 import com.company.utility.UserUtility;
 import com.mongodb.ConnectionString;
@@ -44,7 +42,7 @@ public class Database {
         Database.initialized = true;
     }
 
-    public static void resetDatabase() throws DuplicateException, MandatoryException {
+    public static void resetDatabase() {
         if (!Database.initialized) {
             Database.initialize();
         }

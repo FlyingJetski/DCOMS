@@ -1,9 +1,6 @@
 package com.company.utility;
 
 import com.company.common.Database;
-import com.company.common.exceptions.DuplicateException;
-import com.company.common.exceptions.MandatoryException;
-import com.company.common.exceptions.NotFoundException;
 import com.company.models.Item;
 import com.company.models.Pagination;
 import com.company.models.Sort;
@@ -80,14 +77,11 @@ public class ItemUtility {
         return Database.items.aggregate(aggregation).into(new ArrayList<Item>());
     }
 
-    public static Item findItemById(ObjectId id) throws NotFoundException {
+    public static Item findItemById(ObjectId id) {
         ArrayList<Bson> aggregation = new ArrayList<Bson>();
         aggregation.add(match(eq("_id", id)));
         aggregation.add(lookup("categories", "category_id", "_id", "category"));
         Item item = Database.items.aggregate(aggregation).into(new ArrayList<Item>()).get(0);
-        if (item == null) {
-            throw new NotFoundException("Item ID");
-        }
         return item;
     }
 
@@ -112,13 +106,7 @@ public class ItemUtility {
         return true;
     }
 
-    public static ObjectId insertItem(Item item) throws DuplicateException, MandatoryException {
-        if (findItemByName(item.getName()) != null) {
-            throw new DuplicateException("The item ");
-        }
-        if (!checkRequiredFieldsItem(item)) {
-            throw new MandatoryException("item name and category must be filled");
-        }
+    public static ObjectId insertItem(Item item) {
         InsertOneResult result = Database.items.insertOne(item);
         return result.getInsertedId().asObjectId().getValue();
     }
@@ -142,7 +130,7 @@ public class ItemUtility {
         return updates;
     }
 
-    public static boolean updateItem(ObjectId id, Item item) throws NotFoundException {
+    public static boolean updateItem(ObjectId id, Item item) {
         Bson filter = eq("_id", id);
         ArrayList<Bson> updates = new ArrayList<Bson>();
         updates.add(set("updated_at", new Date()));
@@ -150,14 +138,14 @@ public class ItemUtility {
         if (Database.items.updateOne(filter, updates).getModifiedCount() >= 1 ? true : false) {
             return true;
         }
-        throw new NotFoundException("Item ID");
+        return false;
     }
 
-    public static boolean deleteItem(ObjectId id) throws NotFoundException {
+    public static boolean deleteItem(ObjectId id) {
         Bson filter = eq("_id", id);
         if (Database.items.deleteOne(filter).getDeletedCount() >= 1 ? true : false) {
             return true;
         }
-        throw new NotFoundException("Item ID");
+        return false;
     }
 }

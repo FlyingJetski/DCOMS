@@ -2,10 +2,6 @@ package com.company.utility;
 
 import com.company.common.Authentication;
 import com.company.common.Database;
-import com.company.common.exceptions.DuplicateException;
-import com.company.common.exceptions.MandatoryException;
-import com.company.common.exceptions.NotFoundException;
-import com.company.common.exceptions.NotMatchException;
 import com.company.models.Pagination;
 import com.company.models.Sort;
 import com.company.models.User;
@@ -49,12 +45,9 @@ public class UserUtility {
         return Database.users.aggregate(aggregation).into(new ArrayList<User>());
     }
 
-    public static User findUserById(ObjectId id) throws NotFoundException {
+    public static User findUserById(ObjectId id) {
         Bson filter = eq("_id", id);
         User user = Database.users.find(filter).first();
-        if (user == null) {
-            throw new NotFoundException("User ID");
-        }
         return user;
     }
 
@@ -79,14 +72,7 @@ public class UserUtility {
         return true;
     }
 
-    public static ObjectId insertUser(User user) throws DuplicateException, MandatoryException {
-        if (findUserByUsername(user.getUsername()) != null) {
-            throw new DuplicateException("The username");
-        }
-        if (!checkRequiredFieldsUser(user)) {
-            throw new MandatoryException("username, password, first name, and IC/passport must be filled");
-        }
-
+    public static ObjectId insertUser(User user) {
         user.setPassword(Authentication.hash(user.getPassword()));
         InsertOneResult result = Database.users.insertOne(user);
         return result.getInsertedId().asObjectId().getValue();
@@ -117,7 +103,7 @@ public class UserUtility {
         return updates;
     }
 
-    public static boolean updateUser(ObjectId id, User user) throws NotFoundException {
+    public static boolean updateUser(ObjectId id, User user) {
         Bson filter = eq("_id", id);
         ArrayList<Bson> updates = new ArrayList<Bson>();
         updates.add(set("updated_at", new Date()));
@@ -126,31 +112,31 @@ public class UserUtility {
         if (Database.users.updateOne(filter, updates).getModifiedCount() >= 1 ? true : false) {
             return true;
         }
-        throw new NotFoundException("User ID");
+        return false;
     }
 
-    public static boolean updateUserPassword(ObjectId id, String oldPassword, String newPassword) throws NotFoundException, NotMatchException {
+    public static boolean updateUserPassword(ObjectId id, String oldPassword, String newPassword) {
         Bson filter = eq("_id", id);
         User user = findUserById(id);
         if (!Authentication.match(oldPassword, user.getPassword())) {
-            throw new NotMatchException("Old password", "saved password");
+            return false;
         }
         Bson update = set("password", Authentication.hash(newPassword));
         return Database.users.updateOne(filter, update).getModifiedCount() >= 1 ? true : false;
     }
 
-    public static boolean deleteUser(ObjectId id) throws NotFoundException {
+    public static boolean deleteUser(ObjectId id) {
         Bson filter = eq("_id", id);
         if (Database.users.deleteOne(filter).getDeletedCount() >= 1 ? true : false) {
             return true;
         }
-        throw new NotFoundException("User ID");
+        return false;
     }
 
-    public static boolean logIn(String username, String password) throws NotFoundException {
+    public static boolean logIn(String username, String password) {
         User user = findUserByUsername(username);
         if (!Authentication.match(password, user.getPassword())) {
-            throw new NotFoundException("User with specified username and password");
+            return false;
         }
         return true;
     }

@@ -1,9 +1,6 @@
 package com.company.utility;
 
 import com.company.common.Database;
-import com.company.common.exceptions.DuplicateException;
-import com.company.common.exceptions.MandatoryException;
-import com.company.common.exceptions.NotFoundException;
 import com.company.models.Category;
 import com.company.models.Pagination;
 import com.company.models.Sort;
@@ -56,12 +53,9 @@ public class CategoryUtility {
         return Database.categories.aggregate(aggregation).into(new ArrayList<Category>());
     }
 
-    public static Category findCategoryById(ObjectId id) throws NotFoundException {
+    public static Category findCategoryById(ObjectId id) {
         Bson filter = eq("_id", id);
         Category category = Database.categories.find(filter).first();
-        if (category == null) {
-            throw new NotFoundException("Category ID");
-        }
         return category;
     }
 
@@ -77,13 +71,7 @@ public class CategoryUtility {
         return true;
     }
 
-    public static ObjectId insertCategory(Category category) throws DuplicateException, MandatoryException {
-        if (findCategoryByName(category.getName()) != null) {
-            throw new DuplicateException("The category name");
-        }
-        if (!checkRequiredFieldsCategory(category)) {
-            throw new MandatoryException("category name must be filled");
-        }
+    public static ObjectId insertCategory(Category category) {
         InsertOneResult result = Database.categories.insertOne(category);
         return result.getInsertedId().asObjectId().getValue();
     }
@@ -98,7 +86,7 @@ public class CategoryUtility {
         return updates;
     }
 
-    public static boolean updateCategory(ObjectId id, Category category) throws NotFoundException {
+    public static boolean updateCategory(ObjectId id, Category category) {
         Bson filter = eq("_id", id);
         ArrayList<Bson> updates = new ArrayList<Bson>();
         updates.add(set("updated_at", new Date()));
@@ -106,14 +94,14 @@ public class CategoryUtility {
         if (Database.categories.updateOne(filter, updates).getModifiedCount() >= 1 ? true : false) {
             return true;
         }
-        throw new NotFoundException("Category ID");
+        return false;
     }
 
-    public static boolean deleteCategory(ObjectId id) throws NotFoundException {
+    public static boolean deleteCategory(ObjectId id) {
         Bson filter = eq("_id", id);
         if (Database.categories.deleteOne(filter).getDeletedCount() >= 1 ? true : false) {
             return true;
         }
-        throw new NotFoundException("Category ID");
+        return false;
     }
 }
